@@ -66,7 +66,7 @@
                         </div>
                         <div class="item-menu text-center">
                             <div class="menu-icon">
-                                <a href="" class="orange" style="font-size: 40px;">
+                                <a href="/presensi/lokasi" class="orange" style="font-size: 40px;">
                                     <ion-icon name="location"></ion-icon>
                                 </a>
                             </div>
@@ -154,25 +154,25 @@
                 <div class="tab-content mt-2" style="margin-bottom:100px;">
                     <div class="tab-pane fade show active" id="home" role="tabpanel">
                         <!--
-                                                                                                            <ul class="listview image-listview">
-                                                                                                                @foreach ($historibulanini as $d)
+                                                                                                                <ul class="listview image-listview">
+                                                                                                                    @foreach ($historibulanini as $d)
     @php
         $path = Storage::url('uploads/absensi' . $d->foto_in);
     @endphp
-                                                                                                                    <li>
-                                                                                                                        <div class="item">
-                                                                                                                            <div class="icon-box bg-primary">
-                                                                                                                                <ion-icon name="image"></ion-icon>
-                                                                                                                            </div>
-                                                                                                                            <div class="in">
-                                                                                                                                <div>{{ date('d-m-Y', strtotime($d->tgl_presensi)) }}</div>
-                                                                                                                                    <span class="badge badge-success">{{ $d->jam_in }}</span>
+                                                                                                                        <li>
+                                                                                                                            <div class="item">
+                                                                                                                                <div class="icon-box bg-primary">
+                                                                                                                                    <ion-icon name="image"></ion-icon>
                                                                                                                                 </div>
-                                                                                                                            </div>
-                                                                                                                    </li>
+                                                                                                                                <div class="in">
+                                                                                                                                    <div>{{ date('d-m-Y', strtotime($d->tgl_presensi)) }}</div>
+                                                                                                                                        <span class="badge badge-success">{{ $d->jam_in }}</span>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                        </li>
     @endforeach
-                                                                                                                                                                                                                                                        </ul>
-                                                                                                                        -->
+                                                                                                                                                                                                                                                            </ul>
+                                                                                                                            -->
                         <style>
                             .historicontent {
                                 display: flex;

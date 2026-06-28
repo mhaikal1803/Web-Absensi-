@@ -1,4 +1,4 @@
-@extends('layouts.presensi')
+﻿@extends('layouts.presensi')
 @section('header')
     <!-- App Header -->
     <div class="appHeader bg-primary text-light">
@@ -12,6 +12,11 @@
     </div>
     <!-- * App Header -->
     <style>
+        .webcam-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
         .webcamp,
         .webcamp video {
             display: inline-block;
@@ -21,12 +26,27 @@
             border-radius: 15px;
         }
 
+        #face-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #face-status {
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
         #map {
             height: 200px;
         }
 
         .jam-digital-malasngoding {
-
             background-color: #27272783;
             position: absolute;
             top: 72px;
@@ -47,12 +67,24 @@
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ asset('assets/js/face-api.min.js') }}"></script>
 @endsection
 @section('content')
+    @php
+        $fotoKaryawan = Auth::guard('karyawan')->user()->foto;
+        $fotoReferensi = !empty($fotoKaryawan) ? url(Storage::url('uploads/karyawan/' . $fotoKaryawan)) : null;
+    @endphp
+
     <div class="row" style="margin-top: 70px">
         <div class="col">
             <input type="hidden" id="lokasi">
-            <div class="webcamp"></div>
+            <div class="webcam-wrapper">
+                <div class="webcamp"></div>
+                <canvas id="face-canvas"></canvas>
+            </div>
+            <div id="face-status" class="alert alert-warning mt-1 mb-1">
+                Memuat model face recognition...
+            </div>
         </div>
     </div>
     <div class="jam-digital-malasngoding">
@@ -71,12 +103,11 @@
                     Sudah Absen Hari Ini
                 </button>
             @else
-                <button id="takeabsen" class="btn btn-primary btn-block">
+                <button id="takeabsen" class="btn btn-primary btn-block" disabled>
                     <ion-icon name="camera-outline"></ion-icon>
-                    Absen Masuk
+                    Menyiapkan Face Recognition...
                 </button>
             @endif
-
         </div>
     </div>
     <div class="row mt-2">
@@ -84,10 +115,6 @@
             <div id="map"></div>
         </div>
     </div>
-
-    <audio id="notifikasi_in">
-        <source src="{{ asset('assets/sound/notifikasi_in.mp3') }}" type="audio/mpeg">
-    </audio>
 @endsection
 
 @push('myscript')
@@ -115,7 +142,15 @@
         }
     </script>
     <script>
-        var notifikasi_in = document.getElementById('notifikasi_in');
+        var image = '';
+        var faceMatcher = null;
+        var modelsLoaded = false;
+        var faceDetectionInterval = null;
+        var faceReferenceUrl = @json($fotoReferensi);
+        var faceStatus = document.getElementById('face-status');
+        var faceCanvas = document.getElementById('face-canvas');
+        var takeAbsenButton = document.getElementById('takeabsen');
+
         Webcam.set({
             width: 640,
             height: 480,
@@ -124,6 +159,149 @@
         });
 
         Webcam.attach('.webcamp');
+
+        initFaceRecognition();
+
+        async function initFaceRecognition() {
+            if (!faceReferenceUrl) {
+                setFaceStatus('Foto profil belum tersedia. Upload foto profil dulu untuk face recognition.', 'danger');
+                return;
+            }
+
+            try {
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+                    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+                    faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+                ]);
+
+                var referenceImage = await faceapi.fetchImage(faceReferenceUrl);
+                var referenceDetection = await faceapi
+                    .detectSingleFace(referenceImage, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+
+                if (!referenceDetection) {
+                    setFaceStatus('Wajah pada foto profil tidak terdeteksi. Ganti foto profil yang lebih jelas.', 'danger');
+                    return;
+                }
+
+                faceMatcher = new faceapi.FaceMatcher(
+                    new faceapi.LabeledFaceDescriptors('karyawan', [referenceDetection.descriptor]),
+                    0.5
+                );
+                modelsLoaded = true;
+                setFaceStatus('Face recognition siap. Arahkan wajah ke kamera.', 'success');
+                enableAbsenButton();
+                startFaceDetectionLoop();
+            } catch (error) {
+                console.error(error);
+                setFaceStatus('Gagal memuat face recognition. Pastikan file model tersedia di public/models.', 'danger');
+            }
+        }
+
+        function enableAbsenButton() {
+            if (takeAbsenButton && !takeAbsenButton.disabled) {
+                return;
+            }
+
+            if (takeAbsenButton && takeAbsenButton.classList.contains('btn-primary')) {
+                takeAbsenButton.disabled = false;
+                takeAbsenButton.innerHTML = '<ion-icon name="camera-outline"></ion-icon> Absen Masuk';
+            }
+        }
+
+        function setFaceStatus(message, type) {
+            faceStatus.innerText = message;
+            faceStatus.className = 'alert alert-' + type + ' mt-1 mb-1';
+        }
+
+        function getWebcamVideo() {
+            return document.querySelector('.webcamp video');
+        }
+
+        function startFaceDetectionLoop() {
+            var video = getWebcamVideo();
+
+            if (!video || video.readyState < 2) {
+                setTimeout(startFaceDetectionLoop, 500);
+                return;
+            }
+
+            var displaySize = {
+                width: video.offsetWidth,
+                height: video.offsetHeight
+            };
+
+            faceapi.matchDimensions(faceCanvas, displaySize);
+
+            faceDetectionInterval = setInterval(async function() {
+                var detections = await faceapi
+                    .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceLandmarks()
+                    .withFaceDescriptors();
+
+                var resizedDetections = faceapi.resizeResults(detections, displaySize);
+                var context = faceCanvas.getContext('2d');
+                context.clearRect(0, 0, faceCanvas.width, faceCanvas.height);
+
+                resizedDetections.forEach(function(detection) {
+                    var box = detection.detection.box;
+                    var result = faceMatcher.findBestMatch(detection.descriptor);
+                    var isMatch = result.label !== 'unknown';
+
+                    context.strokeStyle = isMatch ? '#22c55e' : '#ef4444';
+                    context.lineWidth = 4;
+                    context.strokeRect(box.x, box.y, box.width, box.height);
+
+                    context.fillStyle = isMatch ? '#22c55e' : '#ef4444';
+                    context.font = '16px Arial';
+                    context.fillText(isMatch ? 'Wajah cocok' : 'Wajah tidak cocok', box.x, Math.max(box.y - 8, 16));
+                });
+            }, 700);
+        }
+
+        async function verifyFace() {
+            if (!modelsLoaded || !faceMatcher) {
+                Swal.fire({
+                    title: 'Face Recognition Belum Siap',
+                    text: 'Tunggu sampai model face recognition selesai dimuat.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+
+            var video = getWebcamVideo();
+            var detection = await faceapi
+                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks()
+                .withFaceDescriptor();
+
+            if (!detection) {
+                Swal.fire({
+                    title: 'Wajah Tidak Terdeteksi',
+                    text: 'Pastikan wajah terlihat jelas di kamera.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+
+            var result = faceMatcher.findBestMatch(detection.descriptor);
+
+            if (result.label === 'unknown') {
+                Swal.fire({
+                    title: 'Wajah Tidak Cocok',
+                    text: 'Wajah tidak sesuai dengan foto profil karyawan.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+
+            return true;
+        }
 
         var lokasi = document.getElementById('lokasi');
         if (navigator.geolocation) {
@@ -155,11 +333,21 @@
 
         }
 
-        $('#takeabsen').click(function(e) {
+        $('#takeabsen').click(async function(e) {
+            e.preventDefault();
+
+            var faceValid = await verifyFace();
+
+            if (!faceValid) {
+                return;
+            }
+
             Webcam.snap(function(uri) {
                 image = uri;
             });
+
             var lokasi = $('#lokasi').val();
+
             $.ajax({
                 type: 'POST',
                 url: '/presensi/store',
@@ -171,12 +359,9 @@
                 cache: false,
                 success: function(respond) {
                     if (respond == 0) {
-                        if (respond == 0) {
-                            notifikasi_in.play();
-                        }
                         Swal.fire({
                             title: 'Berhasil !',
-                            text: 'Terimakasih, Selamat bekerja !',
+                            text: 'Wajah cocok. Terimakasih, Selamat bekerja !',
                             icon: 'success',
                             confirmButtonText: 'OK'
                         })
@@ -197,3 +382,4 @@
         });
     </script>
 @endpush
+

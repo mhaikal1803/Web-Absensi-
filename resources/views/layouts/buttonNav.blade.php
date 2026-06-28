@@ -20,7 +20,7 @@
             </div>
         </div>
     </a>
-    <a href="#" class="item {{ request()->is('#') ? 'active' : '' }}">
+    <a href="/presensi/lokasi" class="item {{ request()->is('#') ? 'active' : '' }}">
         <div class="col">
             <ion-icon name="location-outline" role="img" class="md hydrated" aria-label="people outline"></ion-icon>
             <strong>Location</strong>

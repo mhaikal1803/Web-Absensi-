@@ -206,6 +206,13 @@ class PresensiController extends Controller
         return view('presensi.gethistory', compact('history'));
     }
 
+    public function lokasi(Request $request)
+    {
+        $lok_kantor = DB::table('konfigurasi_lokasi')->where('id', 1)->first();
+
+        return view('presensi.lokasi', compact('lok_kantor'));
+    }
+
     public function monitoring()
     {
         return view('presensi.monitoring');

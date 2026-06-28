@@ -38,6 +38,9 @@ Route::middleware(['auth:karyawan'])->group(function () {
     // History Presensi
     Route::get('/presensi/history', [PresensiController::class, 'history']);
     Route::post('/gethistory', [PresensiController::class, 'gethistory']);
+
+    // Lokasi
+    Route::get('/presensi/lokasi', [PresensiController::class, 'lokasi']);
 });
 
 Route::middleware(['auth:user'])->group(function () {
