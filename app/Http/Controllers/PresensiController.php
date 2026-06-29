@@ -170,8 +170,8 @@ class PresensiController extends Controller
                 ]);
 
                 $foto = $upload['secure_url'];
-            } catch (\Exception $e) {
-                return Redirect::back()->with(['error' => 'Upload foto ke Cloudinary gagal']);
+            } catch (\Throwable $e) {
+                return Redirect::back()->with(['error' => $e->getMessage()]);
             }
         } else {
             $foto = $karyawan->foto;
