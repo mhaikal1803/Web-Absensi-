@@ -198,7 +198,7 @@
             } catch (error) {
                 console.error(error);
                 setFaceStatus('Gagal memuat face recognition. Pastikan file model tersedia di public/models.',
-                'danger');
+                    'danger');
             }
         }
 
@@ -264,7 +264,7 @@
             }, 700);
         }
 
-        async function verifyFace() {
+        async function verifyFace(capturedImage) {
             if (!modelsLoaded || !faceMatcher) {
                 Swal.fire({
                     title: 'Face Recognition Belum Siap',
@@ -275,9 +275,13 @@
                 return false;
             }
 
-            var video = getWebcamVideo();
+            var img = await faceapi.fetchImage(capturedImage);
+
             var detection = await faceapi
-                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions({
+                    inputSize: 416,
+                    scoreThreshold: 0.4
+                }))
                 .withFaceLandmarks()
                 .withFaceDescriptor();
 
@@ -339,15 +343,15 @@
         $('#takeabsen').click(async function(e) {
             e.preventDefault();
 
-            var faceValid = await verifyFace();
+            Webcam.snap(function(uri) {
+                image = uri;
+            });
+
+            var faceValid = await verifyFace(image);
 
             if (!faceValid) {
                 return;
             }
-
-            Webcam.snap(function(uri) {
-                image = uri;
-            });
 
             var lokasi = $('#lokasi').val();
 
