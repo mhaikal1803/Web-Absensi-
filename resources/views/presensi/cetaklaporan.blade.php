@@ -100,9 +100,11 @@
             <tr>
                 <td rowspan="5">
                     @php
-                        $path = Storage::url('uploads/karyawan/' . $karyawan->foto);
+                        $path = \Illuminate\Support\Str::startsWith($karyawan->foto, 'http')
+                            ? $karyawan->foto
+                            : url(Storage::url('uploads/karyawan/' . $karyawan->foto));
                     @endphp
-                    <img src="{{ url($path) }}" alt="" width="120px" height="140px">
+                    <img src="{{ $path }}" alt="" width="120px" height="140px">
                 </td>
             </tr>
             <tr>
@@ -136,14 +138,16 @@
             </tr>
             @foreach ($presensi as $d)
                 @php
-                    $path_in = Storage::url('uploads/absensi/' . $d->foto_in);
+                    $path_in = \Illuminate\Support\Str::startsWith($d->foto_in, 'http')
+                        ? $d->foto_in
+                        : url(Storage::url('uploads/absensi/' . $d->foto_in));
                     $jamterlambat = selisih($d->jam_masuk, $d->jam_in);
                 @endphp
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ date('d-m-Y', strtotime($d->tgl_presensi)) }}</td>
                     <td>{{ $d->jam_in }}</td>
-                    <td><img src="{{ url($path_in) }}" alt="" class="foto"></td>
+                    <td><img src="{{ $path_in }}" alt="" class="foto"></td>
                     <td>
                         @if ($d->jam_in > $d->jam_masuk)
                             Terlambat {{ $jamterlambat }}

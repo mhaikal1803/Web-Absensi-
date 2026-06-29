@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class KaryawanController extends Controller
 {
@@ -27,7 +27,18 @@ class KaryawanController extends Controller
         $no_hp = $request->no_hp;
         $password = Hash::make('12345');
         if ($request->hasFile('foto')) {
-            $foto = $nik . '.' . $request->file('foto')->getClientOriginalExtension();
+            try {
+                $upload = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
+                    'folder' => 'presensigps/karyawan',
+                    'public_id' => $nik,
+                    'overwrite' => true,
+                    'resource_type' => 'image',
+                ]);
+
+                $foto = $upload['secure_url'];
+            } catch (\Exception $e) {
+                return Redirect::back()->with(['warning' => 'Upload foto ke Cloudinary gagal']);
+            }
         } else {
             $foto = null;
         }
@@ -43,10 +54,6 @@ class KaryawanController extends Controller
             ];
             $simpan = DB::table('karyawan')->insert($data);
             if ($simpan) {
-                if ($request->hasFile('foto')) {
-                    $folderPath = "uploads/karyawan/";
-                    $request->file('foto')->storeAs($folderPath, $foto, 'public');
-                }
                 return Redirect::back()->with(['success' => 'Data Berhasil Disimpan']);
             }
         } catch (\Exception $e) {
@@ -73,7 +80,18 @@ class KaryawanController extends Controller
         $password = Hash::make('12345');
         $old_foto = $request->old_foto;
         if ($request->hasFile('foto')) {
-            $foto = $nik . '.' . $request->file('foto')->getClientOriginalExtension();
+            try {
+                $upload = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
+                    'folder' => 'presensigps/karyawan',
+                    'public_id' => $nik,
+                    'overwrite' => true,
+                    'resource_type' => 'image',
+                ]);
+
+                $foto = $upload['secure_url'];
+            } catch (\Exception $e) {
+                return Redirect::back()->with(['warning' => 'Upload foto ke Cloudinary gagal']);
+            }
         } else {
             $foto = $old_foto;
         }
@@ -88,12 +106,6 @@ class KaryawanController extends Controller
             ];
             $update = DB::table('karyawan')->where('nik', $nik)->update($data);
             if ($update) {
-                if ($request->hasFile('foto')) {
-                    $folderPath = "uploads/karyawan/";
-                    $folderPathOld = "uploads/karyawan/" . $old_foto;
-                    Storage::disk('public')->delete($folderPathOld);
-                    $request->file('foto')->storeAs($folderPath, $foto, 'public');
-                }
                 return Redirect::back()->with(['success' => 'Data Berhasil Diupdate']);
             }
         } catch (\Exception $e) {

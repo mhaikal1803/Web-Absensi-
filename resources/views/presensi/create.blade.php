@@ -72,7 +72,7 @@
 @section('content')
     @php
         $fotoKaryawan = Auth::guard('karyawan')->user()->foto;
-        $fotoReferensi = !empty($fotoKaryawan) ? url(Storage::url('uploads/karyawan/' . $fotoKaryawan)) : null;
+        $fotoReferensi = !empty($fotoKaryawan) ? $fotoKaryawan : null;
     @endphp
 
     <div class="row" style="margin-top: 70px">
@@ -182,7 +182,8 @@
                     .withFaceDescriptor();
 
                 if (!referenceDetection) {
-                    setFaceStatus('Wajah pada foto profil tidak terdeteksi. Ganti foto profil yang lebih jelas.', 'danger');
+                    setFaceStatus('Wajah pada foto profil tidak terdeteksi. Ganti foto profil yang lebih jelas.',
+                        'danger');
                     return;
                 }
 
@@ -196,7 +197,8 @@
                 startFaceDetectionLoop();
             } catch (error) {
                 console.error(error);
-                setFaceStatus('Gagal memuat face recognition. Pastikan file model tersedia di public/models.', 'danger');
+                setFaceStatus('Gagal memuat face recognition. Pastikan file model tersedia di public/models.',
+                'danger');
             }
         }
 
@@ -256,7 +258,8 @@
 
                     context.fillStyle = isMatch ? '#22c55e' : '#ef4444';
                     context.font = '16px Arial';
-                    context.fillText(isMatch ? 'Wajah cocok' : 'Wajah tidak cocok', box.x, Math.max(box.y - 8, 16));
+                    context.fillText(isMatch ? 'Wajah cocok' : 'Wajah tidak cocok', box.x, Math.max(box
+                        .y - 8, 16));
                 });
             }, 700);
         }
@@ -382,4 +385,3 @@
         });
     </script>
 @endpush
-

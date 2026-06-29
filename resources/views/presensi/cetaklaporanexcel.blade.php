@@ -100,9 +100,11 @@
             <tr>
                 <td rowspan="5">
                     @php
-                        $path = Storage::url('uploads/karyawan/' . $karyawan->foto);
+                        $path = \Illuminate\Support\Str::startsWith($karyawan->foto, 'http')
+                            ? $karyawan->foto
+                            : url(Storage::url('uploads/karyawan/' . $karyawan->foto));
                     @endphp
-                    <img src="{{ url($path) }}" alt="" width="120px" height="140px">
+                    <img src="{{ $path }}" alt="" width="120px" height="140px">
                 </td>
             </tr>
             <tr>

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class PresensiController extends Controller
 {
@@ -82,19 +83,27 @@ class PresensiController extends Controller
             ->where('nik', $nik)->where('hari', $namahari)->first();
 
         $image = $request->image;
-        $folderPath = "uploads/absensi/";
-        Storage::disk('public')->makeDirectory($folderPath);
         $formatName = $nik . '_' . $tgl_presensi;
-        $image_parts = explode(";base64,", $image);
-        $image_base64 = base64_decode($image_parts[1]);
-        $fileName = $formatName . '.png';
-        $file = $folderPath . $fileName;
+
+        try {
+            $upload = Cloudinary::uploadApi()->upload($image, [
+                'folder' => 'presensigps/absensi',
+                'public_id' => $formatName,
+                'overwrite' => true,
+                'resource_type' => 'image',
+            ]);
+
+            $fotoUrl = $upload['secure_url'];
+        } catch (\Exception $e) {
+            echo "error|Gagal upload foto absen ke Cloudinary.";
+            return;
+        }
         $status = $jam > $jamkerja->jam_masuk ? 'telat' : 'hadir';
         $data = [
             'nik' => $nik,
             'tgl_presensi' => $tgl_presensi,
             'jam_in' => $jam,
-            'foto_in' => $fileName,
+            'foto_in' => $fotoUrl,
             'lokasi' => $lokasi,
             'kode_jam_kerja' => $jamkerja->kode_jam_kerja,
             'status' => $status,
@@ -112,7 +121,6 @@ class PresensiController extends Controller
 
             if ($simpan) {
                 echo 0;
-                Storage::disk('public')->put($file, $image_base64);
             } else {
                 echo 1;
             }
@@ -146,16 +154,29 @@ class PresensiController extends Controller
         $nik = Auth::guard('karyawan')->user()->nik;
         $nama_lengkap = $request->nama_lengkap;
         $no_hp = $request->no_hp;
-        $password = Hash::make($request->password);
         $karyawan = DB::table('karyawan')->where('nik', $nik)->first();
+
         $request->validate([
-            'foto' => '|image|mimes:jpeg,png,jpg|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
         if ($request->hasFile('foto')) {
-            $foto = $nik . '.' . $request->file('foto')->getClientOriginalExtension();
+            try {
+                $upload = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
+                    'folder' => 'presensigps/karyawan',
+                    'public_id' => $nik,
+                    'overwrite' => true,
+                    'resource_type' => 'image',
+                ]);
+
+                $foto = $upload['secure_url'];
+            } catch (\Exception $e) {
+                return Redirect::back()->with(['error' => 'Upload foto ke Cloudinary gagal']);
+            }
         } else {
             $foto = $karyawan->foto;
         }
+
         if (empty($request->password)) {
             $data = [
                 'nama_lengkap' => $nama_lengkap,
@@ -166,16 +187,14 @@ class PresensiController extends Controller
             $data = [
                 'nama_lengkap' => $nama_lengkap,
                 'no_hp' => $no_hp,
-                'password' => $password,
+                'password' => Hash::make($request->password),
                 'foto' => $foto,
             ];
         }
+
         $update = DB::table('karyawan')->where('nik', $nik)->update($data);
+
         if ($update) {
-            if ($request->hasFile('foto')) {
-                $folderPath = "uploads/karyawan/";
-                $request->file('foto')->storeAs($folderPath, $foto, 'public');
-            }
             return Redirect::back()->with(['success' => 'Profile Berhasil Diupdate']);
         } else {
             return Redirect::back()->with(['error' => 'Profile Gagal Diupdate']);

@@ -64,7 +64,9 @@
                                         <tbody>
                                             @foreach ($karyawan as $d)
                                                 @php
-                                                    $path = Storage::url('uploads/karyawan/' . $d->foto);
+                                                    $path = \Illuminate\Support\Str::startsWith($d->foto, 'http')
+                                                        ? $d->foto
+                                                        : url(Storage::url('uploads/karyawan/' . $d->foto));
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
@@ -77,7 +79,7 @@
                                                             <img src="{{ asset('assets/img/noprofile.jpg') }}"
                                                                 class='avatar'alt="">
                                                         @else
-                                                            <img src="{{ url($path) }}" class="avatar" alt="">
+                                                            <img src="{{ $path }}" class="avatar" alt="">
                                                         @endif
                                                     </td>
                                                     <td>
