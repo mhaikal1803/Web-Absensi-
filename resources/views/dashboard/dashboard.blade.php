@@ -22,17 +22,17 @@
             </a>
             <div id="user-detail">
                 <div class="avatar">
-                    @if (!empty(Auth::guard('karyawan')->user()->foto))
+                    @if ($presensihariini != null)
                         @php
-                            $foto = Auth::guard('karyawan')->user()->foto;
-                            $path = \Illuminate\Support\Str::startsWith($foto, 'http')
-                                ? $foto
-                                : url(Storage::url('uploads/karyawan/' . $foto));
+                            $fotoIn = $presensihariini->foto_in;
+                            $path = \Illuminate\Support\Str::startsWith($fotoIn, 'http')
+                                ? $fotoIn
+                                : url(Storage::url('uploads/absensi/' . $fotoIn));
                         @endphp
-                        <img src="{{ $path }}" alt="avatar" class="imaged w64"
+                        <img src="{{ $path }}" alt="" class="imaged w64"
                             style="height:64px; object-fit:cover">
                     @else
-                        <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">
+                        <ion-icon name="camera"></ion-icon>
                     @endif
                 </div>
                 <div id="user-info">
@@ -157,25 +157,25 @@
                 <div class="tab-content mt-2" style="margin-bottom:100px;">
                     <div class="tab-pane fade show active" id="home" role="tabpanel">
                         <!--
-                                                                                                                        <ul class="listview image-listview">
-                                                                                                                            @foreach ($historibulanini as $d)
+                                                                                                                            <ul class="listview image-listview">
+                                                                                                                                @foreach ($historibulanini as $d)
     @php
         $path = Storage::url('uploads/absensi' . $d->foto_in);
     @endphp
-                                                                                                                                <li>
-                                                                                                                                    <div class="item">
-                                                                                                                                        <div class="icon-box bg-primary">
-                                                                                                                                            <ion-icon name="image"></ion-icon>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="in">
-                                                                                                                                            <div>{{ date('d-m-Y', strtotime($d->tgl_presensi)) }}</div>
-                                                                                                                                                <span class="badge badge-success">{{ $d->jam_in }}</span>
+                                                                                                                                    <li>
+                                                                                                                                        <div class="item">
+                                                                                                                                            <div class="icon-box bg-primary">
+                                                                                                                                                <ion-icon name="image"></ion-icon>
                                                                                                                                             </div>
-                                                                                                                                        </div>
-                                                                                                                                </li>
+                                                                                                                                            <div class="in">
+                                                                                                                                                <div>{{ date('d-m-Y', strtotime($d->tgl_presensi)) }}</div>
+                                                                                                                                                    <span class="badge badge-success">{{ $d->jam_in }}</span>
+                                                                                                                                                </div>
+                                                                                                                                            </div>
+                                                                                                                                    </li>
     @endforeach
-                                                                                                                                                                                                                                                                    </ul>
-                                                                                                                                    -->
+                                                                                                                                                                                                                                                                        </ul>
+                                                                                                                                        -->
                         <style>
                             .historicontent {
                                 display: flex;
