@@ -192,12 +192,12 @@ class PresensiController extends Controller
             ];
         }
 
-        $update = DB::table('karyawan')->where('nik', $nik)->update($data);
+        try {
+            DB::table('karyawan')->where('nik', $nik)->update($data);
 
-        if ($update) {
             return Redirect::back()->with(['success' => 'Profile Berhasil Diupdate']);
-        } else {
-            return Redirect::back()->with(['error' => 'Profile Gagal Diupdate']);
+        } catch (\Throwable $e) {
+            return Redirect::back()->with(['error' => 'Profile Gagal Diupdate: ' . $e->getMessage()]);
         }
     }
 
