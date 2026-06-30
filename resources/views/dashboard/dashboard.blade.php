@@ -22,17 +22,17 @@
             </a>
             <div id="user-detail">
                 <div class="avatar">
-                    @if ($presensihariini != null)
+                    @if (!empty(Auth::guard('karyawan')->user()->foto))
                         @php
-                            $fotoIn = $presensihariini->foto_in;
-                            $path = \Illuminate\Support\Str::startsWith($fotoIn, 'http')
-                                ? $fotoIn
-                                : url(Storage::url('uploads/absensi/' . $fotoIn));
+                            $foto = Auth::guard('karyawan')->user()->foto;
+                            $path = \Illuminate\Support\Str::startsWith($foto, 'http')
+                                ? $foto
+                                : url(Storage::url('uploads/karyawan/' . $foto));
                         @endphp
-                        <img src="{{ $path }}" alt="" class="imaged w64"
+                        <img src="{{ $path }}" alt="avatar" class="imaged w64"
                             style="height:64px; object-fit:cover">
                     @else
-                        <ion-icon name="camera"></ion-icon>
+                        <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">
                     @endif
                 </div>
                 <div id="user-info">
@@ -91,9 +91,13 @@
                                     <div class="iconpresence">
                                         @if ($presensihariini != null)
                                             @php
-                                                $path = Storage::url('uploads/absensi/' . $presensihariini->foto_in);
+                                                $fotoIn = $presensihariini->foto_in;
+                                                $path = \Illuminate\Support\Str::startsWith($fotoIn, 'http')
+                                                    ? $fotoIn
+                                                    : url(Storage::url('uploads/absensi/' . $fotoIn));
                                             @endphp
-                                            <img src="{{ url($path) }}" alt="" class="imaged w64">
+                                            <img src="{{ $path }}" alt="" class="imaged w64"
+                                                style="height:64px; object-fit:cover">
                                         @else
                                             <ion-icon name="camera"></ion-icon>
                                         @endif
