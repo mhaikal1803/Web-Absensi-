@@ -157,7 +157,7 @@ class PresensiController extends Controller
         $karyawan = DB::table('karyawan')->where('nik', $nik)->first();
 
         $request->validate([
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         if ($request->hasFile('foto')) {

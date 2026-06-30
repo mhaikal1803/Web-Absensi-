@@ -189,7 +189,7 @@
 
                 faceMatcher = new faceapi.FaceMatcher(
                     new faceapi.LabeledFaceDescriptors('karyawan', [referenceDetection.descriptor]),
-                    0.5
+                    0.6
                 );
                 modelsLoaded = true;
                 setFaceStatus('Face recognition siap. Arahkan wajah ke kamera.', 'success');
