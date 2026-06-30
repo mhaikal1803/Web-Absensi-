@@ -60,7 +60,7 @@
                         </div>
                     </div>
                     <div class="custom-file-upload" id="fileUpload1">
-                        <input type="file" name="foto" id="fileuploadInput" accept=".png, .jpg, .jpeg">
+                        <input type="file" name="foto" id="fileuploadInput" accept="image/*">
                         <label for="fileuploadInput">
                             <span>
                                 <strong>

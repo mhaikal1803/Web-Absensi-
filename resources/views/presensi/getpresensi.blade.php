@@ -16,7 +16,9 @@ function selisih($jam_masuk, $jam_keluar)
 ?>
 @foreach ($presensi as $d)
     @php
-        $folderPath = Storage::url('uploads/absensi/' . $d->foto_in);
+        $folderPath = \Illuminate\Support\Str::startsWith($d->foto_in, 'http')
+            ? $d->foto_in
+            : url(Storage::url('uploads/absensi/' . $d->foto_in));
     @endphp
     <tr>
         <td>{{ $loop->iteration }}</td>
@@ -25,7 +27,7 @@ function selisih($jam_masuk, $jam_keluar)
         <td>{{ $d->nama_jam_kerja }} ({{ $d->awal_jam_masuk }} s/d {{ $d->jam_masuk }}) </td>
         <td>{{ $d->jam_in }}</td>
         <td>
-            <img src="{{ url($folderPath) }}" class="avatar" alt="">
+            <img src="{{ $folderPath }}" class="avatar" alt="">
         </td>
         <td>
             @if ($d->jam_in >= $d->jam_masuk)
