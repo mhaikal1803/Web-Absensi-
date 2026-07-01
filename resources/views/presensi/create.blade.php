@@ -1,4 +1,4 @@
-﻿@extends('layouts.presensi')
+@extends('layouts.presensi')
 @section('header')
     <!-- App Header -->
     <div class="appHeader bg-primary text-light">
@@ -17,14 +17,14 @@
             width: 100%;
         }
 
-        .webcamp,
         .webcamp video {
             display: inline-block;
             width: 100% !important;
             margin: auto;
             height: auto !important;
             border-radius: 15px;
-            transform: scaleX(-1);
+            transform: scaleX(-1) !important;
+            -webkit-transform: scaleX(-1) !important;
         }
 
         #face-canvas {
@@ -35,7 +35,9 @@
             height: 100%;
             pointer-events: none;
             z-index: 10;
-            transform: scaleX(-1);
+            transform: scaleX(-1) !important;
+            -webkit-transform: scaleX(-1) !important;
+            transform-origin: center center;
         }
 
         #face-status {
@@ -65,20 +67,6 @@
             text-align: center;
             margin-top: 0;
             margin-bottom: 0;
-        }
-
-        .webcamp,
-        .webcamp video,
-        .webcamp canvas,
-        .webcamp object,
-        .webcamp embed {
-            transform: scaleX(-1) !important;
-            -webkit-transform: scaleX(-1) !important;
-        }
-
-        #face-canvas {
-            transform: scaleX(-1) !important;
-            -webkit-transform: scaleX(-1) !important;
         }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
