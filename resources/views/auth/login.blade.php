@@ -11,8 +11,8 @@
     <title>Presensi GPS Magi</title>
     <meta name="description" content="Mobilekit HTML Mobile UI Kit">
     <meta name="keywords" content="bootstrap 4, mobile template, cordova, phonegap, mobile, html" />
-    <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png')}}" sizes="32x32">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{asset ('assets/img/icon/192x192.png')}}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/img/icon/192x192.png') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="manifest" href="__manifest.json">
 </head>
@@ -39,18 +39,19 @@
             </div>
             <div class="section mt-1 mb-5">
                 @php
-                $message = Session::get('warning');
+                    $message = Session::get('warning');
                 @endphp
                 @if (session::get('warning'))
-                <div class="alert alert-outline-warning">
-                {{ $message }}
-                </div>
+                    <div class="alert alert-outline-warning">
+                        {{ $message }}
+                    </div>
                 @endif
                 <form action="/proseslogin" method="POST">
                     @csrf
                     <div class="form-group boxed">
                         <div class="input-wrapper">
-                            <input type="text" name="nik" class="form-control" id="nik" placeholder="NIK">
+                            <input type="text" name="nik" class="form-control" id="nik"
+                                placeholder="Username/NIK">
                             <i class="clear-input">
                                 <ion-icon name="close-circle"></ion-icon>
                             </i>
@@ -59,7 +60,8 @@
 
                     <div class="form-group boxed">
                         <div class="input-wrapper">
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Password">
                             <i class="clear-input">
                                 <ion-icon name="close-circle"></ion-icon>
                             </i>
@@ -86,18 +88,18 @@
 
     <!-- ///////////// Js Files ////////////////////  -->
     <!-- Jquery -->
-    <script src="{{ asset('assets/js/lib/jquery-3.4.1.min.js')}}"></script>
+    <script src="{{ asset('assets/js/lib/jquery-3.4.1.min.js') }}"></script>
     <!-- Bootstrap-->
-    <script src="{{ asset('assets/js/lib/popper.min.js')}}"></script>
-    <script src="{{ asset('assets/js/lib/bootstrap.min.js')}}"></script>
+    <script src="{{ asset('assets/js/lib/popper.min.js') }}"></script>
+    <script src="{{ asset('assets/js/lib/bootstrap.min.js') }}"></script>
     <!-- Ionicons -->
     <script type="module" src="https://unpkg.com/ionicons@5.0.0/dist/ionicons/ionicons.js"></script>
     <!-- Owl Carousel -->
-    <script src="{{ asset('assets/js/plugins/owl-carousel/owl.carousel.min.js')}}"></script>
+    <script src="{{ asset('assets/js/plugins/owl-carousel/owl.carousel.min.js') }}"></script>
     <!-- jQuery Circle Progress -->
-    <script src="{{ asset('assets/js/plugins/jquery-circle-progress/circle-progress.min.js')}}"></script>
+    <script src="{{ asset('assets/js/plugins/jquery-circle-progress/circle-progress.min.js') }}"></script>
     <!-- Base Js File -->
-    <script src="{{ asset('assets/js/base.js')}}"></script>
+    <script src="{{ asset('assets/js/base.js') }}"></script>
 
 
 </body>

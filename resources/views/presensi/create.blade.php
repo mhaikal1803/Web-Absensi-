@@ -66,6 +66,20 @@
             margin-top: 0;
             margin-bottom: 0;
         }
+
+        .webcamp,
+        .webcamp video,
+        .webcamp canvas,
+        .webcamp object,
+        .webcamp embed {
+            transform: scaleX(-1) !important;
+            -webkit-transform: scaleX(-1) !important;
+        }
+
+        #face-canvas {
+            transform: scaleX(-1) !important;
+            -webkit-transform: scaleX(-1) !important;
+        }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
