@@ -15,15 +15,20 @@
         .webcam-wrapper {
             position: relative;
             width: 100%;
-            aspect-ratio: 4 / 3;
             overflow: hidden;
             border-radius: 15px;
             background: #111;
         }
 
         .webcamp {
-            width: 100%;
-            height: 100%;
+            width: 100% !important;
+            height: auto !important;
+            margin: auto;
+            border-radius: 15px;
+            overflow: hidden;
+            transform: scaleX(-1) !important;
+            -webkit-transform: scaleX(-1) !important;
+            transform-origin: center center;
         }
 
         .webcamp video,
@@ -32,14 +37,10 @@
         .webcamp embed {
             display: block;
             width: 100% !important;
-            height: 100% !important;
-            object-fit: cover;
+            height: auto !important;
             border-radius: 15px;
-        }
-
-        .webcamp video {
-            transform: scaleX(-1) !important;
-            -webkit-transform: scaleX(-1) !important;
+            transform: none !important;
+            -webkit-transform: none !important;
         }
 
         #face-canvas {
