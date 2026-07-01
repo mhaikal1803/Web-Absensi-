@@ -209,7 +209,7 @@
 
                 faceMatcher = new faceapi.FaceMatcher(
                     new faceapi.LabeledFaceDescriptors('karyawan', [referenceDetection.descriptor]),
-                    0.45
+                    0.5
                 );
                 modelsLoaded = true;
                 setFaceStatus('Face recognition siap. Arahkan wajah ke kamera.', 'success');
@@ -270,7 +270,7 @@
                 resizedDetections.forEach(function(detection) {
                     var box = detection.detection.box;
                     var result = faceMatcher.findBestMatch(detection.descriptor);
-                    var isMatch = result.label !== 'unknown' && result.distance <= 0.45;
+                    var isMatch = result.label !== 'unknown' && result.distance <= 0.5;
 
                     var mirroredX = faceCanvas.width - box.x - box.width;
                     var label = isMatch ? 'Wajah cocok' : 'Wajah tidak cocok';
@@ -320,7 +320,7 @@
 
             var result = faceMatcher.findBestMatch(detection.descriptor);
 
-            if (result.label === 'unknown' || result.distance > 0.45) {
+            if (result.label === 'unknown' || result.distance > 0.5) {
                 Swal.fire({
                     title: 'Wajah Tidak Cocok',
                     text: 'Wajah tidak sesuai dengan foto profil karyawan.',
