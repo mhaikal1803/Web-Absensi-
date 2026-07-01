@@ -24,6 +24,7 @@
             margin: auto;
             height: auto !important;
             border-radius: 15px;
+            transform: scaleX(-1);
         }
 
         #face-canvas {
@@ -34,6 +35,7 @@
             height: 100%;
             pointer-events: none;
             z-index: 10;
+            transform: scaleX(-1);
         }
 
         #face-status {
@@ -155,7 +157,8 @@
             width: 640,
             height: 480,
             image_format: 'jpeg',
-            jpeg_quality: 80
+            jpeg_quality: 80,
+            flip_horiz: true
         });
 
         Webcam.attach('.webcamp');
