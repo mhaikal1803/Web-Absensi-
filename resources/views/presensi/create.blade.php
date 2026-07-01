@@ -51,9 +51,8 @@
             height: 100% !important;
             pointer-events: none;
             z-index: 10;
-            transform: scaleX(-1) !important;
-            -webkit-transform: scaleX(-1) !important;
-            transform-origin: center center;
+            transform: none !important;
+            -webkit-transform: none !important;
         }
 
         #face-status {
@@ -273,14 +272,17 @@
                     var result = faceMatcher.findBestMatch(detection.descriptor);
                     var isMatch = result.label !== 'unknown';
 
+                    var mirroredX = faceCanvas.width - box.x - box.width;
+                    var label = isMatch ? 'Wajah cocok' : 'Wajah tidak cocok';
+                    var labelY = Math.max(box.y - 8, 16);
+
                     context.strokeStyle = isMatch ? '#22c55e' : '#ef4444';
                     context.lineWidth = 4;
-                    context.strokeRect(box.x, box.y, box.width, box.height);
+                    context.strokeRect(mirroredX, box.y, box.width, box.height);
 
                     context.fillStyle = isMatch ? '#22c55e' : '#ef4444';
                     context.font = '16px Arial';
-                    context.fillText(isMatch ? 'Wajah cocok' : 'Wajah tidak cocok', box.x, Math.max(box
-                        .y - 8, 16));
+                    context.fillText(label, mirroredX, labelY);
                 });
             }, 700);
         }
